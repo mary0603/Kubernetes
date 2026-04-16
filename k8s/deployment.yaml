@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: myportfolio
-          image: mfblessed078/myportfolio:latest
+          image: mfblessed078/myportfolio:v2
           imagePullPolicy: Always
 
           ports:

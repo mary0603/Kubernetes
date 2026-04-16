@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "mfblessed078/myportfolio"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG = "v2"
         CONTAINER_NAME = "myportfolio-container"
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
