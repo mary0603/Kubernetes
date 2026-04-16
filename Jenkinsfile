@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "mfblessed078/myportfolio"
+        IMAGE_NAME = "mfblessed078/webportfolio"
         IMAGE_TAG =  "${BUILD_NUMBER}"
         DOCKER_CREDENTIALS_ID = 'dockerhub-creds'
 
-        CONTAINER_NAME = "myportfolio-container"
+        CONTAINER_NAME = "webportfolio-container"
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
 
