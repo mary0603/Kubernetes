@@ -44,18 +44,4 @@ spec:
               cpu: "200m"
               memory: "128Mi"
 
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8081
-            initialDelaySeconds: 15
-            periodSeconds: 20
-            failureThreshold: 3
-
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 10
 
