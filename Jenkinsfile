@@ -47,7 +47,8 @@ pipeline {
 
                 sh 'kubectl apply -f k8s/service.yaml'
 
-                
+                sh 'kubectl rollout restart deployment/myportfolio'
+
 
                 sh 'kubectl rollout status deployment/myportfolio --timeout=120s'
 
