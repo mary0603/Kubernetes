@@ -2,11 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "mfblessed078/webportfolio"
-        IMAGE_TAG =  "${BUILD_NUMBER}"
-        DOCKER_CREDENTIALS_ID = 'dockerhub-creds'
-
-        CONTAINER_NAME = "webportfolio-container"
+        IMAGE_NAME = "mfblessed078/myportfolio"
+        IMAGE_TAG = "v2"
+        CONTAINER_NAME = "myportfolio-container"
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
 
@@ -17,34 +15,27 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Image Build') {
             steps {
-                echo '========== STAGE 2: Building Docker image =========='
-
-                script {
-                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-
-                    echo "Docker image built successfully: ${IMAGE_NAME}:${IMAGE_TAG}"
-               }
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
             }
         }
 
         stage('Push Image') {
             steps {
-                echo '========== STAGE 3: Pushing image to Docker Hub =========='
-
-                script {
-                    docker.withRegistry('', "${DOCKER_CREDENTIALS_ID}") {
-                        dockerImage.push("${IMAGE_TAG}")
-                        dockerImage.push('latest')
-                    }
-
-                    echo "Image pushed to Docker Hub: ${IMAGE_NAME}:${IMAGE_TAG} and :latest"
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    '''
                 }
             }
         }
-
-
 
         stage('Deploy') {
             steps {
@@ -56,10 +47,9 @@ pipeline {
 
                 sh 'kubectl apply -f k8s/service.yaml'
 
-                sh 'kubectl rollout restart deployment/myportfolio'
+                
 
-
-                sh 'kubectl rollout status deployment/myportfolio --timeout=300s'
+                sh 'kubectl rollout status deployment/myportfolio --timeout=120s'
 
                 echo '---------- Deployment Status ----------'
                 sh 'kubectl get pods -l app=myportfolio'
@@ -67,21 +57,5 @@ pipeline {
             }
         }
     }
-post {
-        success {
-            echo '========== PIPELINE COMPLETED SUCCESSFULLY =========='
-            echo "Application deployed. Access at http://<EC2_PUBLIC_IP>:30081"
-        }
-        failure {
-            echo '========== PIPELINE FAILED =========='
-            echo 'Check the stage logs above for error details.'
-        }
-        always {
-            sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
-            sh "docker rmi ${IMAGE_NAME}:latest || true"
-            echo 'Workspace cleaned up.'
-        }
-    }
-
 }
 
