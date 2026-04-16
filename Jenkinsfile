@@ -41,7 +41,9 @@ pipeline {
             steps {
                 echo '========== STAGE 4: Deploying to Kubernetes =========='
 
-                sh 'kubectl apply -f k8s/deployment.yaml'
+		sh  'export KUBECONFIG=/var/lib/jenkins/.kube/config'
+               
+                 sh 'kubectl apply -f k8s/deployment.yaml'
 
                 sh 'kubectl apply -f k8s/service.yaml'
 
