@@ -57,5 +57,21 @@ pipeline {
             }
         }
     }
+post {
+        success {
+            echo '========== PIPELINE COMPLETED SUCCESSFULLY =========='
+            echo "Application deployed. Access at http://<EC2_PUBLIC_IP>:30081"
+        }
+        failure {
+            echo '========== PIPELINE FAILED =========='
+            echo 'Check the stage logs above for error details.'
+        }
+        always {
+            sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
+            sh "docker rmi ${IMAGE_NAME}:v2 || true"
+            echo 'Workspace cleaned up.'
+        }
+    }
+
 }
 
