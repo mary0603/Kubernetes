@@ -46,6 +46,8 @@ pipeline {
                 echo '========== STAGE 4: Deploying to Kubernetes =========='
                 sh '''
                     kubectl apply -f k8s/service.yaml
+                    
+                    kubectl apply -f k8s/service.yaml
                     kubectl set image deployment/myportfolio myportfolio=${IMAGE_NAME}:${IMAGE_TAG}
                     kubectl rollout status deployment/myportfolio --timeout=120s
                     kubectl get pods -l app=myportfolio
